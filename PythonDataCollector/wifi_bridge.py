@@ -1,7 +1,7 @@
 import socket
 import json
 import pandas as pd
-
+from datetime import datetime
 UDP_IP = "0.0.0.0"
 UDP_PORT = 8080
 SAMPLES_PER_SYMBOL = 1000
@@ -17,11 +17,16 @@ def record_samples(symbol):
     global df
     samples = []
     print(f"Recording samples for symbol {symbol}")
-    for _ in range(SAMPLES_PER_SYMBOL):
+    for i in range(SAMPLES_PER_SYMBOL):
         data, addr = UDPClientSocket.recvfrom(2048)
         json_data = json.loads(data.decode('utf-8'))
+        print(json_data)
+        timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S.%f")
+        print(timestamp)
+        print('count: ', i)
         sample = {'symbol': symbol}
         for i in range(6):
+
             sensor_data = json_data[str(i)]
             sample[f"{i}_ax"] = sensor_data['ax']
             sample[f"{i}_ay"] = sensor_data['ay']
@@ -44,5 +49,3 @@ with socket.socket(socket.AF_INET, socket.SOCK_DGRAM) as UDPClientSocket:
 
 df.to_csv("hand_gesture_data.csv", index=False)
 print("Data recording complete. Saved as hand_gesture_data.csv")
-
-        
