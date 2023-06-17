@@ -5,7 +5,8 @@ import numpy as np
 
 UDP_IP = "0.0.0.0"
 UDP_PORT = 8080
-
+streamlit_ip = "192.168.137.23"
+streamlit_port = "8888"
 # Load the trained model
 model = tf.keras.models.load_model('C:/Users/ajayp/OneDrive/Documents/PlatformIO/FinalProject_HandGlove/PyhtonMLserver/trained_model.h5')
 
@@ -30,3 +31,7 @@ with socket.socket(socket.AF_INET, socket.SOCK_DGRAM) as UDPClientSocket:
         predicted_class = np.argmax(prediction)
 
         print("Predicted class:", predicted_class)
+
+        # Send predicted valye to streamlit app
+        message = str(predicted_class).encode('utf-8')
+        UDPClientSocket.sendto(message,(streamlit_ip,streamlit_port))
