@@ -7,7 +7,7 @@ UDP_IP = "0.0.0.0"
 UDP_PORT = 8080
 
 # Load the trained model
-model = tf.keras.models.load_model('trained_model.h5')
+model = tf.keras.models.load_model('C:/Users/ajayp/OneDrive/Documents/PlatformIO/FinalProject_HandGlove/PyhtonMLserver/trained_model.h5')
 
 with socket.socket(socket.AF_INET, socket.SOCK_DGRAM) as UDPClientSocket:
     UDPClientSocket.bind((UDP_IP, UDP_PORT))

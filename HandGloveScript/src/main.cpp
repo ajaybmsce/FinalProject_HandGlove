@@ -64,7 +64,7 @@ struct SensorData {
 
 void setup(){
 
-  Serial.begin(9600);
+  Serial.begin(921600);
     //Wifi connection 
   Serial.println("Initiating WiFi...");
   WiFi.mode(WIFI_STA);

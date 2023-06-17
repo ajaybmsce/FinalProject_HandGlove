@@ -1,3 +1,4 @@
+
 import socket
 import json
 import pandas as pd
@@ -6,7 +7,7 @@ from datetime import datetime
 UDP_IP = "0.0.0.0"
 UDP_PORT = 8080
 SAMPLES_PER_SYMBOL = 1000
-SYMBOLS = ['6', '7', '8', '9']
+SYMBOLS = ['6']
 
 # Load the existing CSV file if it exists
 try:
@@ -40,7 +41,7 @@ def record_samples(symbol):
             sample[f"{i}_gz"] = sensor_data['gz']
         samples.append(sample)
 
-    df = df.append(samples, ignore_index=True)
+    df = pd.concat([df, samples], ignore_index=True)                                        
     print(f"Samples recorded for symbol {symbol}")
 
 with socket.socket(socket.AF_INET, socket.SOCK_DGRAM) as UDPClientSocket:
