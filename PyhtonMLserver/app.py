@@ -54,18 +54,18 @@ class GestureRecognitionApp:
         self.gesture_frame.pack()
         self.reset_status()
         self.active_app = "Gesture Recognition Application"
-        self.update_title()
+        self.update_title("Gesture Recognition")
 
     def open_app2(self):
         self.reset_status()
         self.active_app = "Application 2"
-        self.update_title()
+        self.update_title("Application 2")
         # Add code to open Application 2
 
     def open_app3(self):
         self.reset_status()
         self.active_app = "Application 3"
-        self.update_title()
+        self.update_title("Application 3")
         # Add code to open Application 3
 
     def start_receiving(self):
