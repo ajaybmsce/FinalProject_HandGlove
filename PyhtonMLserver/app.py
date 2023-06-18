@@ -100,6 +100,7 @@ class GestureRecognitionApp:
                 sensor_values = json.loads(data.decode('utf-8'))
 
                 json_data = json.loads(data.decode('utf-8'))
+                print(json_data)
                 sensor_values = []
                 for i in range(6):
                     sensor_values.extend(list(json_data[str(i)].values()))
