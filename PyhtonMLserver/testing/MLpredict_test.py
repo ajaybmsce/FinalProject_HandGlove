@@ -32,10 +32,4 @@ while True:
 
     print("Predicted class:", predicted_class)
 
-    # Send predicted value to Streamlit app using TCP
-    streamlit_ip = "127.0.0.1"
-    streamlit_port = 9000
-    TCPClientSocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    TCPClientSocket.connect((streamlit_ip, streamlit_port))
-    TCPClientSocket.send(str(predicted_class).encode('utf-8'))
-    TCPClientSocket.close()
+  

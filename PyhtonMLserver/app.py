@@ -4,6 +4,9 @@ import json
 import threading
 import tensorflow as tf
 import numpy as np
+import os
+from PIL import Image, ImageTk
+import pyautogui
 
 UDP_IP = "0.0.0.0"
 UDP_PORT = 8080
@@ -19,6 +22,8 @@ class GestureRecognitionApp:
 
         self.is_receiving = False
         self.active_app = "Home"
+
+        self.udp_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 
         self.status_label = tk.Label(self.root, text="Status: Not Receiving Data", fg="white", bg="#232323", font=("Arial", 12))
         self.status_label.pack(anchor="ne", padx=10, pady=10)
@@ -48,6 +53,9 @@ class GestureRecognitionApp:
 
         self.gesture_frame.pack()
         self.gesture_frame.pack_forget()
+
+        self.image_label = tk.Label(self.gesture_frame)
+        self.image_label.pack()
 
     def show_gesture_app(self):
         self.app_buttons_frame.pack_forget()
@@ -87,18 +95,15 @@ class GestureRecognitionApp:
 
     def reset_status(self):
         self.start_button.config(state=tk.NORMAL)
-        self.status_label.config(text="Status: Not Receiving Data", fg="white", bg="#232323")
         self.info_label.config(text="Welcome to the Hand Gesture Glove App!", fg="white")
 
     def receive_data(self):
-        udp_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-        udp_socket.bind((UDP_IP, UDP_PORT))
-
         while self.is_receiving:
             try:
-                data, addr = udp_socket.recvfrom(1024)
-                sensor_values = json.loads(data.decode('utf-8'))
+                data, addr = self.udp_socket.recvfrom(1024)
+                self.status_label.config(text="Status: Receiving Data", fg="lime", bg="#232323")
 
+                sensor_values = json.loads(data.decode('utf-8'))
                 json_data = json.loads(data.decode('utf-8'))
                 print(json_data)
                 sensor_values = []
@@ -109,19 +114,34 @@ class GestureRecognitionApp:
                 prediction = model.predict(input_data)
                 predicted_class = np.argmax(prediction)
 
+                if self.active_app == "Application 2":
+                    if predicted_class == 1:
+                        pyautogui.press('w')  # Move paddle up
+                    elif predicted_class == 2:
+                        pyautogui.press('s')  # Move paddle down
+
+                
                 self.info_label.config(text=f"Predicted Value: {predicted_class}")
+
+                # Load and display the corresponding image
+                image_path = f"C:/Users/ajayp/OneDrive/Documents/PlatformIO/FinalProject_HandGlove/PyhtonMLserver/resource/symbol{predicted_class}.jpg"
+                image = Image.open(image_path)
+                image = image.rotate(-90, expand=True)
+                self.photo = ImageTk.PhotoImage(image)
+                self.image_label.config(image=self.photo)
+
             except socket.timeout:
                 pass
-
-        udp_socket.close()
 
     def update_title(self, title):
         self.root.title(title)
 
     def run(self):
+        self.udp_socket.bind((UDP_IP, UDP_PORT))
+        print("***********SERVER-STARTED***********")
         self.root.mainloop()
+        self.udp_socket.close()
 
 if __name__ == "__main__":
     app = GestureRecognitionApp()
     app.run()
-
