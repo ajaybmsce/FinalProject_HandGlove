@@ -16,7 +16,6 @@ UDP_PORT = 8080
 model = tf.keras.models.load_model('trained_model.h5')
 
 
-
 class GestureRecognitionApp:
     def __init__(self):
         self.root = tk.Tk()
@@ -28,30 +27,38 @@ class GestureRecognitionApp:
 
         self.udp_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 
-        self.status_label = tk.Label(self.root, text="Status: Not Receiving Data", fg="white", bg="#232323", font=("Arial", 12))
+        self.status_label = tk.Label(self.root, text="Status: Not Receiving Data", fg="white", bg="#232323",
+                                     font=("Arial", 12))
         self.status_label.pack(anchor="ne", padx=10, pady=10)
 
-        self.info_label = tk.Label(self.root, text="Hand Gesture Glove!", fg="white", bg="#232323", font=("Arial", 16, "bold"))
+        self.info_label = tk.Label(self.root, text="Hand Gesture Glove!", fg="white", bg="#232323",
+                                   font=("Arial", 16, "bold"))
         self.info_label.pack(pady=10)
 
         self.app_buttons_frame = tk.Frame(self.root, bg="#232323")
         self.app_buttons_frame.pack(pady=10)
 
-        self.gesture_button = tk.Button(self.app_buttons_frame, text="Hand Gesture Recognition ", command=self.show_gesture_app, bg="#4CAF50", fg="white", font=("Arial", 12, "bold"))
+        self.gesture_button = tk.Button(self.app_buttons_frame, text="Hand Gesture Recognition ",
+                                        command=self.show_gesture_app, bg="#4CAF50", fg="white",
+                                        font=("Arial", 12, "bold"))
         self.gesture_button.pack(side=tk.LEFT, padx=10)
 
-        self.app2_button = tk.Button(self.app_buttons_frame, text="Mouse Controller", command=self.open_app2, bg="#FF9800", fg="white", font=("Arial", 12, "bold"))
+        self.app2_button = tk.Button(self.app_buttons_frame, text="Mouse Controller", command=self.open_app2,
+                                     bg="#FF9800", fg="white", font=("Arial", 12, "bold"))
         self.app2_button.pack(side=tk.LEFT, padx=10)
 
-        self.app3_button = tk.Button(self.app_buttons_frame, text="Keyboard Controller", command=self.open_app3, bg="#FF5722", fg="white", font=("Arial", 12, "bold"))
+        self.app3_button = tk.Button(self.app_buttons_frame, text="Keyboard Controller", command=self.open_app3,
+                                     bg="#FF5722", fg="white", font=("Arial", 12, "bold"))
         self.app3_button.pack(side=tk.LEFT, padx=10)
 
         self.gesture_frame = tk.Frame(self.root, bg="#232323")
 
-        self.start_button = tk.Button(self.gesture_frame, text="Start", command=self.start_receiving, bg="#4CAF50", fg="white", font=("Arial", 12, "bold"))
+        self.start_button = tk.Button(self.gesture_frame, text="Start", command=self.start_receiving,
+                                      bg="#4CAF50", fg="white", font=("Arial", 12, "bold"))
         self.start_button.pack(pady=10)
 
-        self.stop_button = tk.Button(self.gesture_frame, text="Stop", command=self.stop_receiving, bg="#F44336", fg="white", font=("Arial", 12, "bold"))
+        self.stop_button = tk.Button(self.gesture_frame, text="Stop", command=self.stop_receiving,
+                                     bg="#F44336", fg="white", font=("Arial", 12, "bold"))
         self.stop_button.pack()
 
         self.gesture_frame.pack()
@@ -77,8 +84,6 @@ class GestureRecognitionApp:
         self.active_app = "Keyboard Controller"
         self.update_title("Keyboard Controller")
 
-
-
     def start_receiving(self):
         self.start_button.config(state=tk.DISABLED)
         self.status_label.config(text="Status: Receiving Data", fg="lime", bg="#232323")
@@ -86,10 +91,14 @@ class GestureRecognitionApp:
 
         self.is_receiving = True
 
-        threading.Thread(target=self.receive_data).start()
+        self.receive_thread = threading.Thread(target=self.receive_data)
+        self.receive_thread.start()
+
+    def stop_receiving_thread(self):
+        self.is_receiving = False
 
     def stop_receiving(self):
-        self.is_receiving = False
+        self.stop_receiving_thread()
         self.reset_status()
         self.gesture_frame.pack_forget()
         self.app_buttons_frame.pack()
@@ -125,7 +134,7 @@ class GestureRecognitionApp:
                     elif predicted_class == 6:
                         pyautogui.press('left')  # Move left
                     elif predicted_class == 8:
-                        pyautogui.press('right')  #Move right
+                        pyautogui.press('right')  # Move right
 
                 if self.active_app == "Mouse Controller":
                     if predicted_class == 1:
@@ -138,16 +147,13 @@ class GestureRecognitionApp:
                         move_y = int(gz * 1000)  # Scaling the gyro value for z-axis movement
                         pyautogui.move(move_x, move_y)
                     if predicted_class == 2:
-                        
-                        # Left Click 
+                        # Left Click
                         pyautogui.click(button='left')
 
                     if predicted_class == 6:
-
                         # Right Click
                         pyautogui.click(button='right')
 
-                
                 self.info_label.config(text=f"Predicted Value: {predicted_class}")
 
                 # Load and display the corresponding image
@@ -167,7 +173,10 @@ class GestureRecognitionApp:
         self.udp_socket.bind((UDP_IP, UDP_PORT))
         print("***********SERVER-STARTED***********")
         self.root.mainloop()
+        self.stop_receiving_thread()  # Stop the receiving thread
+        self.receive_thread.join()  # Wait for the receiving thread to finish
         self.udp_socket.close()
+
 
 if __name__ == "__main__":
     app = GestureRecognitionApp()
