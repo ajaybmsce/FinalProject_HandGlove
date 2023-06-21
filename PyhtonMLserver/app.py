@@ -8,7 +8,6 @@ import os
 from PIL import Image, ImageTk
 import pyautogui
 
-
 UDP_IP = "0.0.0.0"
 UDP_PORT = 8080
 
@@ -67,6 +66,32 @@ class GestureRecognitionApp:
         self.image_label = tk.Label(self.gesture_frame)
         self.image_label.pack()
 
+        # Mouse Controller Frame
+        self.mouse_frame = tk.Frame(self.root, bg="#232323")
+        self.mouse_start_button = tk.Button(self.mouse_frame, text="Start", command=self.start_mouse_controller,
+                                            bg="#4CAF50", fg="white", font=("Arial", 12, "bold"))
+        self.mouse_start_button.pack(pady=10)
+
+        self.mouse_stop_button = tk.Button(self.mouse_frame, text="Stop", command=self.stop_mouse_controller,
+                                           bg="#F44336", fg="white", font=("Arial", 12, "bold"))
+        self.mouse_stop_button.pack()
+
+        self.mouse_frame.pack()
+        self.mouse_frame.pack_forget()
+
+        # Keyboard Controller Frame
+        self.keyboard_frame = tk.Frame(self.root, bg="#232323")
+        self.keyboard_start_button = tk.Button(self.keyboard_frame, text="Start", command=self.start_keyboard_controller,
+                                               bg="#4CAF50", fg="white", font=("Arial", 12, "bold"))
+        self.keyboard_start_button.pack(pady=10)
+
+        self.keyboard_stop_button = tk.Button(self.keyboard_frame, text="Stop", command=self.stop_keyboard_controller,
+                                              bg="#F44336", fg="white", font=("Arial", 12, "bold"))
+        self.keyboard_stop_button.pack()
+
+        self.keyboard_frame.pack()
+        self.keyboard_frame.pack_forget()
+
     def show_gesture_app(self):
         self.app_buttons_frame.pack_forget()
         self.gesture_frame.pack()
@@ -76,11 +101,15 @@ class GestureRecognitionApp:
 
     def open_app2(self):
         self.reset_status()
+        self.app_buttons_frame.pack_forget()
+        self.mouse_frame.pack()
         self.active_app = "Mouse Controller"
         self.update_title("Mouse Controller")
 
     def open_app3(self):
         self.reset_status()
+        self.app_buttons_frame.pack_forget()
+        self.keyboard_frame.pack()
         self.active_app = "Keyboard Controller"
         self.update_title("Keyboard Controller")
 
@@ -96,11 +125,14 @@ class GestureRecognitionApp:
 
     def stop_receiving_thread(self):
         self.is_receiving = False
+        self.status_label.config(text="Status: Not Receiving Data", fg="white", bg="#232323")
 
     def stop_receiving(self):
         self.stop_receiving_thread()
         self.reset_status()
         self.gesture_frame.pack_forget()
+        self.mouse_frame.pack_forget()
+        self.keyboard_frame.pack_forget()
         self.app_buttons_frame.pack()
         self.active_app = "Home"
         self.update_title("Hand Gesture Glove")
@@ -169,6 +201,42 @@ class GestureRecognitionApp:
     def update_title(self, title):
         self.root.title(title)
 
+    def start_mouse_controller(self):
+        self.mouse_start_button.config(state=tk.DISABLED)
+        self.status_label.config(text="Status: Receiving Data", fg="lime", bg="#232323")
+        self.info_label.config(text="Mouse Controller", fg="white")
+
+        self.is_receiving = True
+
+        self.receive_thread = threading.Thread(target=self.receive_data)
+        self.receive_thread.start()
+
+    def stop_mouse_controller(self):
+        self.stop_receiving_thread()
+        self.reset_status()
+        self.mouse_frame.pack_forget()
+        self.app_buttons_frame.pack()
+        self.active_app = "Home"
+        self.update_title("Hand Gesture Glove")
+
+    def start_keyboard_controller(self):
+        self.keyboard_start_button.config(state=tk.DISABLED)
+        self.status_label.config(text="Status: Receiving Data", fg="lime", bg="#232323")
+        self.info_label.config(text="Keyboard Controller", fg="white")
+
+        self.is_receiving = True
+
+        self.receive_thread = threading.Thread(target=self.receive_data)
+        self.receive_thread.start()
+
+    def stop_keyboard_controller(self):
+        self.stop_receiving_thread()
+        self.reset_status()
+        self.keyboard_frame.pack_forget()
+        self.app_buttons_frame.pack()
+        self.active_app = "Home"
+        self.update_title("Hand Gesture Glove")
+
     def run(self):
         self.udp_socket.bind((UDP_IP, UDP_PORT))
         print("***********SERVER-STARTED***********")
@@ -181,3 +249,4 @@ class GestureRecognitionApp:
 if __name__ == "__main__":
     app = GestureRecognitionApp()
     app.run()
+
