@@ -8,11 +8,14 @@ import os
 from PIL import Image, ImageTk
 import pyautogui
 
+
 UDP_IP = "0.0.0.0"
 UDP_PORT = 8080
 
 # Load the trained model
 model = tf.keras.models.load_model('trained_model.h5')
+
+
 
 class GestureRecognitionApp:
     def __init__(self):
@@ -37,10 +40,10 @@ class GestureRecognitionApp:
         self.gesture_button = tk.Button(self.app_buttons_frame, text="Hand Gesture Recognition ", command=self.show_gesture_app, bg="#4CAF50", fg="white", font=("Arial", 12, "bold"))
         self.gesture_button.pack(side=tk.LEFT, padx=10)
 
-        self.app2_button = tk.Button(self.app_buttons_frame, text="Application 2", command=self.open_app2, bg="#FF9800", fg="white", font=("Arial", 12, "bold"))
+        self.app2_button = tk.Button(self.app_buttons_frame, text="Mouse Controller", command=self.open_app2, bg="#FF9800", fg="white", font=("Arial", 12, "bold"))
         self.app2_button.pack(side=tk.LEFT, padx=10)
 
-        self.app3_button = tk.Button(self.app_buttons_frame, text="Application 3", command=self.open_app3, bg="#FF5722", fg="white", font=("Arial", 12, "bold"))
+        self.app3_button = tk.Button(self.app_buttons_frame, text="Keyboard Controller", command=self.open_app3, bg="#FF5722", fg="white", font=("Arial", 12, "bold"))
         self.app3_button.pack(side=tk.LEFT, padx=10)
 
         self.gesture_frame = tk.Frame(self.root, bg="#232323")
@@ -66,15 +69,16 @@ class GestureRecognitionApp:
 
     def open_app2(self):
         self.reset_status()
-        self.active_app = "Application 2"
-        self.update_title("Application 2")
+        self.active_app = "Mouse Controller"
+        self.update_title("Mouse Controller")
         # Add code to open Application 2
 
     def open_app3(self):
         self.reset_status()
-        self.active_app = "Application 3"
-        self.update_title("Application 3")
-        # Add code to open Application 3
+        self.active_app = "Keyboard Controller"
+        self.update_title("Keyboard Controller")
+
+
 
     def start_receiving(self):
         self.start_button.config(state=tk.DISABLED)
@@ -114,11 +118,31 @@ class GestureRecognitionApp:
                 prediction = model.predict(input_data)
                 predicted_class = np.argmax(prediction)
 
-                if self.active_app == "Application 2":
+                if self.active_app == "Keyboard Controller":
                     if predicted_class == 1:
                         pyautogui.press('w')  # Move paddle up
                     elif predicted_class == 2:
                         pyautogui.press('s')  # Move paddle down
+
+                if self.active_app == "Mouse Controller":
+                    if predicted_class == 1:
+                        sensor_5_values = json_data['1']
+                        gx = sensor_5_values['gx']
+                        gz = sensor_5_values['gz']
+
+                        # Move the mouse pointer based on sensor values
+                        move_x = int(gx * 100)  # Scaling the gyro value for x-axis movement
+                        move_y = int(gz * 100)  # Scaling the gyro value for z-axis movement
+                        pyautogui.move(move_x, move_y)
+                    if predicted_class == 2:
+                        
+                        # Left Click 
+                        pyautogui.click(button='left')
+
+                    if predicted_class == 6:
+
+                        # Right Click
+                        pyautogui.click(button='right')
 
                 
                 self.info_label.config(text=f"Predicted Value: {predicted_class}")

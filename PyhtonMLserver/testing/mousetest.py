@@ -36,19 +36,15 @@ class MouseControlApp:
                 self.status_label.config(text="Status: Receiving Data", fg="lime", bg="#232323")
 
                 json_data = json.loads(data.decode('utf-8'))
-                sensor_5_values = json_data['5']
+                sensor_5_values = json_data['1']
 
-                # Extract sensor values
-                ax = sensor_5_values['ax']
-                ay = sensor_5_values['ay']
-                az = sensor_5_values['az']
+
                 gx = sensor_5_values['gx']
-                gy = sensor_5_values['gy']
                 gz = sensor_5_values['gz']
 
                 # Move the mouse pointer based on sensor values
                 move_x = int(gx * 100)  # Scaling the gyro value for x-axis movement
-                move_y = int(gy * 100)  # Scaling the gyro value for y-axis movement
+                move_y = int(gz * 100)  # Scaling the gyro value for z-axis movement
                 pyautogui.move(move_x, move_y)
 
             except socket.timeout:
