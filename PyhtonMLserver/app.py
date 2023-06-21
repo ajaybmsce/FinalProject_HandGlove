@@ -71,7 +71,6 @@ class GestureRecognitionApp:
         self.reset_status()
         self.active_app = "Mouse Controller"
         self.update_title("Mouse Controller")
-        # Add code to open Application 2
 
     def open_app3(self):
         self.reset_status()
@@ -120,9 +119,13 @@ class GestureRecognitionApp:
 
                 if self.active_app == "Keyboard Controller":
                     if predicted_class == 1:
-                        pyautogui.press('w')  # Move paddle up
+                        pyautogui.press('up')  # Move up
                     elif predicted_class == 2:
-                        pyautogui.press('s')  # Move paddle down
+                        pyautogui.press('down')  # Move down
+                    elif predicted_class == 6:
+                        pyautogui.press('left')  # Move left
+                    elif predicted_class == 8:
+                        pyautogui.press('right')  #Move right
 
                 if self.active_app == "Mouse Controller":
                     if predicted_class == 1:
@@ -131,8 +134,8 @@ class GestureRecognitionApp:
                         gz = sensor_5_values['gz']
 
                         # Move the mouse pointer based on sensor values
-                        move_x = int(gx * 100)  # Scaling the gyro value for x-axis movement
-                        move_y = int(gz * 100)  # Scaling the gyro value for z-axis movement
+                        move_x = int(gx * 1000)  # Scaling the gyro value for x-axis movement
+                        move_y = int(gz * 1000)  # Scaling the gyro value for z-axis movement
                         pyautogui.move(move_x, move_y)
                     if predicted_class == 2:
                         
