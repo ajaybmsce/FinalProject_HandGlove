@@ -162,7 +162,7 @@ void loop()
         sensorObject["gy"] = gy;
         sensorObject["gz"] = gz;
 
-        delay(100);
+        // delay(100);
     }
 
     String jsonString;

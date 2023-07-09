@@ -7,6 +7,8 @@ import numpy as np
 import os
 from PIL import Image, ImageTk
 import pyautogui
+import time
+pyautogui.FAILSAFE = False
 
 UDP_IP = "0.0.0.0"
 UDP_PORT = 8080
@@ -161,12 +163,16 @@ class GestureRecognitionApp:
                 if self.active_app == "Keyboard Controller":
                     if predicted_class == 1:
                         pyautogui.press('up')  # Move up
+                        time.sleep(2)
                     elif predicted_class == 2:
-                        pyautogui.press('down')  # Move down
+                        pyautogui.press('down')# Move down
+                        time.sleep(2)  
                     elif predicted_class == 6:
                         pyautogui.press('left')  # Move left
-                    elif predicted_class == 8:
+                        time.sleep(2)
+                    elif predicted_class == 7:
                         pyautogui.press('right')  # Move right
+                        time.sleep(2)
 
                 if self.active_app == "Mouse Controller":
                     if predicted_class == 1:
@@ -185,7 +191,7 @@ class GestureRecognitionApp:
                     if predicted_class == 6:
                         # Right Click
                         pyautogui.click(button='right')
-
+                print(f"Predicted Value: {predicted_class}")
                 self.info_label.config(text=f"Predicted Value: {predicted_class}")
 
                 # Load and display the corresponding image
